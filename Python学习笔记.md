@@ -106,6 +106,23 @@ Python中常用的有6种数据类型
 
 定义格式：变量名称 = 变量值
 
+```
+# print语句如何输出多份内容?
+# print(内容1,内容2, ....内容N)
+```
+
+案例-求钱包余额
+
+```python
+# 练习案例：求钱包余额
+money = 50
+print("钱包还有：", money)
+money = money - 10
+print("买了冰淇淋花费10元，还剩余：", money, "元")
+money -= 5
+print("买了可乐花费5元，还剩余：", money, "元")
+```
+
 #### 4、数据类型
 
 可以通过type()语句来得到数据的类型
@@ -206,10 +223,10 @@ Python中常用的三类数据类型占位
 $\color{red}{多个变量占位，变量要用括号括起来，并按照占位的顺序填入}$
 
 ```python
-# 示例
-class_num = 57
+# 字符串格式化
+class_num = '山河大学2022届'
 avg_salary = 16781
-message = "Python大数据学科，北京%s期，毕业平均工资：%s" % (class_num, avg_salary)
+message = "计算机科学与技术，%s毕业生，毕业平均工资：%d" % (class_num, avg_salary)
 print(message)
 ```
 
@@ -275,10 +292,20 @@ print("字符串在Python中的类型是：%s" % type('字符串'))
 
 使用一个变量接收（存储）input语句获取的键盘输入数据即可
 
+要注意，无论键盘输入什么类型的数据，获取到的数据永远都是字符串类型
+
 ```python
 # 示例
 name = input("告诉我你是谁？")
 print("Get！！！你是：%s" % name)
+```
+
+```python
+# 练习-欢迎登录小程序
+user_name = input("用户名称：")
+user_type = input("用户类型：")  # 可以输入VIP
+print("您好：%s，您是尊贵的：%s用户，欢迎您的光临。" % (user_name, user_type))
+print(f"您好：{user_name}，您是尊贵的：{user_type}用户，欢迎您的光临。")
 ```
 
 ---
@@ -441,10 +468,12 @@ print("sum=%d" % sum)
 - 猜完数字后，提示猜了几次
 
 ```python
-# 案例
+# 猜数字案例：设置一个范围1-100的随机整数变量，通过while循环，配合input语句，判断输入的数字是否等于随机数
+# 随机函数
 import random
-num = random.randint(1,100)
-i = 0
+num = random.randint(1, 100)    # 随机生成一个1-100的数字
+print(f'-----{num}-----')   # 把数字打印出来，方便测试
+i = 0   # 记录猜了几次
 flag = True
 while flag:
     guess = int(input("请输入数字："))
@@ -486,12 +515,12 @@ print("World", end='')
 掌握使用while循环嵌套，打印九九乘法表
 
 ```python
-# 案例
+# 案例-打印九九乘法表
 i = 1
 j = 1
 while i <= 9:
     while j <= i:
-        print("%d * %d = %d\t" % (j,i,i*j),end='')
+        print("%d * %d = %d\t" % (j, i, i*j), end='')
         j += 1
     print("")
     i += 1
@@ -673,9 +702,10 @@ for i in range(1,21):
 
 ```python
 # 定义函数
-def add(x,y):
+def add(x, y):
     result = x + y
     print(f"{x} + {y}的结果是:{result}")
+
 
 # 调用函数
 add(5, 6)
@@ -708,7 +738,7 @@ None类型的应用场景：
 
 ```python
 def check_age(age):
-    if age > 18:
+    if age >= 18:
         return "SUCCESS"
     return None
 
@@ -757,16 +787,24 @@ def func(x, y):
 ☆ 使用 global关键字 可以将函数内定义的变量声明为全局变量, 如下所示
 
 ```python
-def test_a():
-    print(num)
+# 变量的作用域
+num = 100
 
-def test_b():
-    # global 关键字声明num是全局变量，不试用global关键字，则num为局部变量
-    global num
+
+def test_a():
     num = 200
     print(num)
 
+
+def test_b():
+    # global 关键字声明num是全局变量
+    global num  # 如果不声明global，则num为局部变量，不会影响最外层的num变量的值，此时等同test_a()
+    num = 200
+    print(num)
+
+
 test_a()
+print(f"全局变量num = {num}")   # 结果：全局变量num = 100
 test_b()
 print(f"全局变量num = {num}")   # 结果：全局变量num = 200
 ```
@@ -3039,13 +3077,521 @@ timeline.render("1960-2019全球GDP前8国家.html")  # 通过时间线绘图
 
 
 
-
-
-
-
 补充：
 
 - 匿名函数需要巩固一下（lambda）
+
+
+
+## 第二阶段
+
+### 第十三章 面向对象
+
+#### 1、初识对象
+
+生活中或是程序中，我们都可以使用设计表格、生产表格、填写表格的形式组织数据
+
+进行对比，在程序中：
+
+- 设计表格，称之为：设计类（class）
+
+- 打印表格，称之为：创建对象
+- 填写表格，称之为：对象属性赋值
+
+#### 2、成员方法
+
+类的定义和使用
+
+> class  类名称：
+> 	类的属性(成员变量)
+> 	
+> 	类的行为(成员方法)
+
+创建类的语法：`对象 = 类名称()`
+
+成员方法的定义语法：
+
+> def  方法名(self,  形参1,  ......,  形参N)：
+> 	方法体
+
+self关键字是成员方法定义的时候，必须填写的。
+
+- 它用来表示类对象自身的意思
+- 当我们使用类对象调用方法的时候，self会自动被python传入
+- 在方法内部，想要访问类的成员变量，必须使用self
+- self出现在形参列表中，但是不占用参数位置，无需理会
+
+#### 3、类和对象
+
+类只是一种程序内的“设计图纸”，需要基于图纸生产实体（对象），才能正常工作，这种套路，称之为：面向对象编程
+
+面向对象编程：设计类，基于类创建对象，由对象做具体的工作
+
+#### 4、构造方法
+
+Python类可以使用：\__init__()方法，称之为构造方法。
+
+可以实现：
+
+- 在创建类对象（构造类）的时候，会自动执行。
+- 在创建类对象（构造类）的时候，将传入参数自动传递给\__init__方法使用。
+
+```python
+class Student:
+    # name = None   # 可以省略
+    # age = None    # 可以省略
+    # tel = None    # 可以省略
+
+    def __init__(self, name, age, tel):
+        self.name = name
+        self.age = age
+        self.tel = tel
+
+
+stu = Student("周杰轮", 31, '18500006666')
+```
+
+注意：构造方法也是成员方法，不要忘记在参数列表中提供：self，在方法内使用成员变量也需要self关键字
+
+**练习：学生信息录入**
+
+```python
+# 练习：学生信息录入
+# 开学了有一批学生信息需要录入系统，请设计一个类，记录学生的：姓名、年龄、地址，这3类信息
+# 请实现：
+#   - 通过for循环，配合input输入语句，并使用构造方法，完成学生信息的键盘录入
+#   - 输入完成后，使用print语句，完成信息的输出
+class Student:
+    def __init__(self, name, age, address):
+        self.name = name
+        self.age = age
+        self.address = address
+
+
+for i in range(3):
+    print(f"当前录入第{i+1}位学生信息，总共需录入3位学生信息")
+    name = input("请输入学生姓名：")
+    age = int(input("请输入学生年龄："))
+    address = input("请输入学生地址：")
+    stu = Student(name, age, address)
+    print(f"学生{i+1}信息录入完成，信息为【学生姓名：{stu.name}，年龄：{stu.age}，地址：{stu.address}】")
+```
+
+#### 5、其他内置方法
+
+上文学习的\__init__ 构造方法，是Python类内置的方法之一。
+
+这些内置的类方法，各自有各自特殊的功能，这些内置方法我们称之为：魔术方法
+
+| 方法      | 功能                                           |
+| --------- | ---------------------------------------------- |
+| \__init__ | 构造方法，可用于创建类对象的时候设置初始化行为 |
+| \__str__  | 用于实现类对象转字符串的行为                   |
+| \__lt__   | 用于2个类对象进行小于或大于比较                |
+| \__le__   | 用于2个类对象进行小于等于或大于等于比较        |
+| \__eq__   | 用于2个类对象进行相等比较                      |
+
+除了\_\_lt\_\_，\_\_le\_\_之外，还有\_\_gt\_\_，\_\_ge\_\_
+
+不实现\_\_eq\_\_方法，对象之间比较的是内存地址，实现了\_\_eq\_\_方法，就可以按照自己的想法来决定2个对象是否相等了
+
+#### 6、封装
+
+面向对象编程，是许多编程语言都支持的一种编程思想。简单理解是：基于模板（类）去创建实体（对象），使用对象完成功能开发。
+
+面向对象包含3大主要特性：
+
+- 封装
+- 继承
+- 多态
+
+**封装：**封装表示的是，将现实世界事物的：<font color='red'>属性</font>、<font color='red'>行为</font>封装到类中，描述为：<font color='red'>成员变量</font>、<font color='red'>成员方法</font>，从而完成程序对现实世界事物的描述
+
+**私有成员**，类中提供了私有成员的形式来支持。
+
+- 私有成员变量
+- 私有成员方法
+
+定义私有成员的方式非常简单，只需要：
+
+- 私有成员变量：变量名以__开头（2个下划线）
+
+- 私有成员方法：方法名以__开头（2个下划线）
+
+即可完成私有成员的设置
+
+私有成员的访问限制：
+
+- 类对象无法访问私有成员
+- 类中的其它成员可以访问私有成员
+
+私有成员的实际意义：在类中提供仅供内部使用的属性和方法，而不对外开放（类对象无法使用）
+
+**练习：设计带有私有成员的手机**
+
+```python
+# 练习-设计带有私有成员的手机
+# 设计一个手机类，内部包含：
+#     - 私有成员变量：__is_5g_enable，类型bool，True表示开启5g，False表示关闭5g
+#     - 私有成员方法：__check_5g()，会判断私有成员__is_5g_enable的值
+#         - 若为True，打印输出：5g开启
+#         - 若为False，打印输出：5g关闭，使用4g网络
+#     - 公开成员方法：call_by_5g()，调用它会执行
+#         - 调用私有成员方法：__check_5g()，判断5g网络状态
+#         - 打印输出：正在通话中
+# 通过完成这个类的设计和使用，体会封装中私有成员的作用
+#     - 对用户公开的，call_by_5g()方法
+#     - 对用户隐藏的，__is_5g_enable私有变量和__check_5g私有成员
+class Phone:
+    __is_5g_enable = True   # 布尔型，True或False
+
+    def __check_5g(self):
+        if self.__is_5g_enable:
+            print("5g开启")
+        else:
+            print("5g关闭，使用4g网络")
+
+    def call_by_5g(self):
+        self.__check_5g()
+        print("正在通话中")
+
+
+phone = Phone()
+phone.call_by_5g()
+```
+
+#### 7、继承
+
+##### 7.1 继承的基础语法
+
+继承分为单继承和多继承，继承表示：将从父类那里继承（复制）来成员变量和成员方法（不含私有）
+
+单继承
+
+> class  类名(父类名)：
+> 	类内容体
+
+多继承
+
+> class  类名(父类1，父类2，......，父类N)：
+> 	类内容体
+
+多继承注意：多个父类中，如果有同名的成员，那么默认以继承顺序（从左到右）为优先级。
+即：先继承的保留，后继承的被覆盖
+
+pass关键字：用来补全语法，让语法不产生错误
+
+```python
+# 继承
+class Phone:
+    IMEI = None         # 序列号
+    producer = None     # 厂商
+
+    def call_by_5g(self):
+        print("5g通话")
+
+
+class NFCReader:
+    nfc_type = "第五代"
+    producer = "HM"
+
+    def read_card(self):
+        print("读取NFC卡")
+
+    def write_card(self):
+        print("写入NFC卡")
+
+
+class RemoteControl:
+    rc_type = "红外遥控"
+
+    def control(self):
+        print("红外遥控开启")
+
+
+class MyPhone(Phone, NFCReader, RemoteControl):     # 多继承
+    pass
+
+
+phone = MyPhone()
+phone.call_by_5g()
+phone.read_card()
+phone.write_card()
+phone.control()
+# 输出同名成员属性
+print(phone.producer)   # 优先级从左到右，所以是Phone类中的producer，不是NFCReader类中的producer
+```
+
+##### 7.2 复写和使用父类成员
+
+**复写**
+
+子类继承父类的成员属性和成员方法后，如果对其“不满意”，那么可以进行复写。
+即：在子类中重新定义同名的属性或方法即可。
+
+**调用父类同名成员**
+
+一旦复写父类成员，那么类对象调用成员的时候，就会调用复写后的新成员
+如果需要使用被复写的父类的成员，需要特殊的调用方式：
+
+方式1：使用类名调用父类成员
+
+- 使用成员变量：父类名.成员变量
+- 使用成员方法：父类名.成员方法(self)
+
+方式2：使用super()调用父类成员
+
+- 使用成员变量：super().成员变量
+- 使用成员方法：super().成员方法()
+
+注意：只能在子类内调用父类的同名成员；子类的类对象直接调用会调用子类复写的成员
+
+```python
+# 复写和使用父类成员
+class Phone:
+    IMEI = None             # 序列号
+    producer = "ITCAST"     # 厂商
+
+    def call_by_5g(self):
+        print("父类的5g通话")
+
+
+class MyPhone(Phone):     	# 单继承
+    producer = "ITHEIMA"    # 复写父类属性
+
+    def call_by_5g(self):   # 复写父类方法
+        # 方式1调用父类成员
+        print(f"父类的品牌是：{Phone.producer}")
+        Phone.call_by_5g(self)
+
+        # 方式2调用父类成员
+        print(f"父类的品牌是：{super().producer}")
+        super().call_by_5g()
+
+        print("子类的5g通话")
+
+
+phone = MyPhone()
+print(phone.producer)
+phone.call_by_5g()
+```
+
+#### 8、类型注解
+
+##### 8.1 变量的类型注解
+
+**类型注解**
+
+Python在3.5版本的时候引入了类型注解，以方便静态类型检查工具，IDE等第三方工具。
+
+类型注解：在代码中涉及数据交互的地方，提供数据类型的注解（显式的说明）。
+
+主要功能：
+
+- 帮助第三方IDE工具（如PyCharm）对代码进行类型推断，协助做代码提示
+- 帮助开发者自身对变量进行类型注释
+
+支持：
+
+- 变量的类型注解
+
+- 函数（方法）形参列表和返回值的类型注解
+
+**类型注解的语法**
+
+为变量设置类型注解的基础语法： `变量: 类型`
+
+除了使用`变量: 类型`，这种语法做注解外，也可以在注释中进行类型注解。语法：`# type: 类型`
+
+注意：类型注解仅仅是提示性的，不是决定性的，并不会真正的对类型做验证和判断。
+
+##### 8.2 函数（方法）的类型注解
+
+掌握为函数（方法）形参和返回值进行类型注解
+
+形参类型注解语法：
+
+```python
+def 函数方法名(形参名: 类型, 形参名: 类型, ......):
+    pass
+```
+
+返回值注解语法：
+
+```python
+def 函数方法名(形参: 类型, ......, 形参: 类型) -> 返回值类型:
+    pass
+```
+
+##### 8.3 Union类型
+
+Union联合类型注解，在变量注解、函数（方法）形参和返回值注解中，均可使用。
+
+什么是Union类型？使用Union可以定义联合类型注解
+
+Union的使用方式
+
+- 导包：from typing import Union
+- 使用：Union[类型, ......, 类型]
+
+```python
+# Union类型
+my_list: list[int] = {1, 2, 3}                      # √
+my_dict: dict[str, int] = {"age": 11, "num": 3}     # √
+
+my_list = [1, 2, "itcast", "itheima"]               # ?
+my_dict = {"name": "周杰轮", "age": 31}              # ?
+
+from typing import Union
+my_list: list[Union[str, int]] = [1, 2, "itcast", "itheima"]
+my_dict: dict[str, Union[str, int]] = {"name": "周杰轮", "age": 31}
+
+
+def func(data: Union[int, str]) -> Union[int, str]:
+    pass
+```
+
+#### 9、多态
+
+理解多态的概念，抽象类（接口）的编程思想
+
+**多态**
+
+多态，指的是：多种状态，即完成某个行为时，使用不同的对象会得到不同的状态。
+
+<font color='red'>同样的行为（函数），传入不同的对象，得到不同的状态</font>
+
+多态常作用在继承关系上
+
+比如
+
+- 函数(方法)形参声明接收父类对象
+- 实际传入父类的子类对象进行工作
+
+即:
+
+- 以父类做定义声明
+- 以子类做实际工作
+- 用以获得同一行为, 不同状态
+
+```python
+# 多态
+class Animal:
+    def speak(self):
+        pass
+
+class Dog(Animal):
+    def speak(self):
+        print("汪汪汪")
+
+class Cat(Animal):
+    def speak(self):
+        print("喵喵喵")
+
+def make_noise(animal: Animal):
+    animal.speak()
+
+dog = Dog()
+cat = Cat()
+make_noise(dog)     # 输出：汪汪汪
+make_noise(cat)     # 输出：喵喵喵
+```
+
+**抽象类（接口）**
+
+父类的方法通过pass关键字空实现
+
+这种设计的含义是：
+
+- 父类用来确定有哪些方法
+
+- 具体的方法实现，由子类自行决定
+
+这种写法，就叫做抽象类（也可以称之为接口）
+抽象类：含有抽象方法的类称之为抽象类
+抽象方法：方法体是空实现的（pass）称之为抽象方法
+
+```python
+# 抽象类（接口）
+class AC:
+    def cool_wind(self):
+        """制冷"""
+        pass
+
+    def hot_wind(self):
+        """制热"""
+        pass
+
+    def swing_l_r(self):
+        """左右摆风"""
+        pass
+
+class Midea_AC(AC):
+    def cool_wind(self):
+        print("美的空调核心制冷科技")
+
+    def hot_wind(self):
+        print("美的空调电热丝加热")
+
+    def swing_l_r(self):
+        print("美的空调无风感左右摆风")
+
+class GREE_AC(AC):
+    def cool_wind(self):
+        print("格力空调变频省电制冷")
+
+    def hot_wind(self):
+        print("格力空调电热丝加热")
+
+    def swing_l_r(self):
+        print("格力空调静音左右摆风")
+```
+
+**总结**
+
+1.什么是多态？
+
+多态指的是，同一个行为，使用不同的对象获得不同的状态。
+
+如，定义函数（方法），通过类型注解声明需要父类对象，实际传入子类对象进行工作，从而获得不同的工作状态
+
+2.什么是抽象类（接口）
+
+包含抽象方法的类，称之为抽象类。抽象方法是指：没有具体实现的方法（pass）称之为抽象方法
+
+3.抽象类的作用
+
+多用于做顶层设计（设计标准），以便子类做具体实现。
+
+也是对子类的一种软性约束，要求子类必须复写（实现）父类的一些方法
+
+并配合多态使用，获得不同的工作状态。
+
+#### 10、综合案例
+
+数据分析
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
