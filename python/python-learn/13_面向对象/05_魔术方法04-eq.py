@@ -1,0 +1,14 @@
+# __eq__比较运算符实现方法
+class Student:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def __eq__(self, other):
+        return self.age == other.age
+
+
+stu1 = Student("周杰轮", 11)
+stu2 = Student("林军杰", 11)
+print(stu1 == stu2)      # 结果：True
+print(stu1 != stu2)      # 结果：False

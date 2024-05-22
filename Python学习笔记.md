@@ -3073,14 +3073,6 @@ timeline.render("1960-2019全球GDP前8国家.html")  # 通过时间线绘图
 
 总结：整个案例比较困难，需要跟随教程一步一步学习，然后理清楚里面的逻辑和顺序
 
----
-
-
-
-补充：
-
-- 匿名函数需要巩固一下（lambda）
-
 
 
 ## 第二阶段
@@ -3569,21 +3561,292 @@ class GREE_AC(AC):
 
 #### 10、综合案例
 
-数据分析
+**数据分析案例**
+
+某公司，有2份数据文件，现需要对其进行分析处理，计算<font color='red'>每日的销售额</font>并以柱状图表的形式进行展示。
+
+1月份数据是普通文本，使用逗号分割数据记录，从前到后分别是（日期，订单id，销售额，销售省份）
+
+2月份数据是JSON数据，同样包含（日期，订单id，销售额，销售省份）
+
+**需求分析**
+
+- 读取数据：设计FileReader类
+- 封装数据对象：设计数据封装类
+- 计算数据对象：对对象进行逻辑计算
+- pyecharts绘图：以面向对象思想重新认识pyecharts
+
+使用面向对象的思想进行开发
+
+---
+
+### 第十四章 SQL
+
+详细SQL可参考：https://www.bilibili.com/video/BV1iF411z7Pu
+
+#### 1、数据库介绍
+
+Q：数据库是什么？有什么作用呢？
+
+A：数据库就是指数据存储的库，作用就是组织数据并存储数据。
+
+Q：数据库和SQL的关系是？
+
+A：数据库（软件）提供数据组织存储的能力；SQL语句则是操作数据、数据库的工具语言
+
+#### 2、MySQL的安装
+
+MySQL安装，下载地址：https://downloads.mysql.com/archives/installer
+
+安装完需要配置环境变量，将MySQL安装目录的bin文件夹的路径，复制进入“Path”即可
+
+通过cmd命令提示符，输入：mysql -uroot -p 回车后输入密码即可
+
+#### 3、MySQL的入门使用
+
+使用命令提示符进行MySQL的操作，不是太方便，一般开发者都会使用第三方的图形化工具进行使用。
+
+可用于MySQL的图形化工具非常多，课程使用跨平台、开源、免费的图形化工具：DBeaver
+
+下载地址：https://dbeaver.io/download
+
+选择免费的社区版（DBeaver Community），选择适用自己电脑系统的安装包下载即可。
+
+#### 4、SQL基础与DDL
+
+简单来说，SQL语言就是操作数据库的专用工具
+
+操作数据库的SQL语言，也基于功能，可以划分为4类：
+
+- 数据定义：DDL（Data Definition Language）：库的创建删除、表的创建删除等
+
+- 数据操纵：DML（Data Manipulation Language）：新增数据、删除数据、修改数据等
+
+- 数据控制：DCL（Data Control Language）：新增用户、删除用户、密码修改、权限管理等
+
+- 数据查询：DQL（Data Query Language）：基于需求查询和计算数据
+
+SQL的语法特征：
+
+- SQL语言，大小写不敏感
+
+- SQL可以单行或多行书写，最后以;号结束
+
+- SQL支持注释：
+  - 单行注释： -- 注释内容（--后面一定要有一个空格）
+  - 单行注释：# 注释内容（# 后面可以不加空格，推荐加上）
+  - 多行注释：/* 注释内容 */
+
+**DDL - 库管理**
+
+```sql
+# 查看数据库
+SHOW DATABASES;
+# 使用数据库
+USE 数据库名称;
+# 创建数据库
+CREATE DATABASE 数据库名称 [CHARSET UTF8];
+# 删除数据库
+DROP DATABASE 数据库名称;
+# 查看当前使用的数据库
+SELECT DATABASE();
+```
+
+**DDL - 表管理**
+
+```sql
+# 查看有哪些表
+SHOW TABLES;	# 需要先选择数据库
+# 删除表
+DROP TABLE 表名称;
+DROP TABLE IF EXISTS 表名称;
+# 创建表
+CREATE TABLE 表名称(
+	列名称 列类型,
+    列名称 列类型,
+    ......
+);
+-- 列类型有
+int				-- 整数
+float			-- 浮点数
+varchar(长度)   -- 文本，长度为数字，做最大长度限制
+date			-- 日期类型
+timestamp		-- 时间戳类型
+```
+
+#### 5、SQL - DML
+
+DML是指数据操作语言，英文全称是Data Manipulation Language，用来对数据库中表的数据记录进行更新。
+
+关键字：插入INSERT、删除DELETE、更新UPDATE
+
+注意：字符串的值，出现在SQL语句中，必须要用单引号包围起来
+
+#### 6、SQL - DQL
+
+##### 6.1 基础查询
+
+```sql
+# 1.基础查询的语法
+SELECT 字段列表|* FROM 表
+# 2.过滤查询的语法
+SELECT 字段列表|* FROM 表 WHERE 条件判断
+```
+
+##### 6.2 分组聚合
+
+```sql
+SELECT 字段|聚合函数 FROM 表 [WHERE 条件] GROUP BY 列
+聚合函数有：
+- SUM(列) 求和
+- AVG(列) 求平均值
+- MIN(列) 求最小值
+- MAX(列) 求最大值
+- COUNT(列|*) 求数量
+```
+
+注意：SELECT中，除了聚合函数外，GROUP BY 了哪个列，哪个列在能出现在SELECT中。
+
+##### 6.3 排序分页
+
+```sql
+SELECT 列|聚合函数|* FROM 表
+WHERE ...
+GROUP BY ...
+ORDER BY ... [ASC | DESC]
+LIMIT n[, m]	-- 取n条数据，或者从第n条开始取m条数据
+```
+
+#### 7、Python & MySQL
+
+##### 7.1 基础使用
+
+除了使用图形化工具以外，我们也可以使用编程语言来执行SQL从而操作数据库。
+
+在Python中，使用第三方库：pymysql 来完成对MySQL数据库的操作。
+
+安装：`pip install pymysql`
+
+**创建到MySQL的数据库链接**
+
+```python
+# 创建到MySQL的数据库链接
+from pymysql import Connection
+# 获取到MySQL数据库的链接对象
+conn = Connection(
+    host='localhost',   # 主机名（或IP地址）
+    port=3306,          # 端口，默认3306
+    user='root',        # 用户名
+    password='123456'   # 密码
+)
+# 打印MySQL数据库软件信息
+print(conn.get_server_info())
+# 关闭到数据库的链接
+conn.close()
+```
+
+**执行非查询性质的SQL语句**
+
+```python
+# 执行非查询性质SQL
+from pymysql import Connection
+# 获取到MySQL数据库的链接对象
+conn = Connection(
+    host='localhost',   # 主机名（或IP地址）
+    port=3306,          # 端口，默认3306
+    user='root',        # 用户名
+    password='123456'   # 密码
+)
+# 获取游标对象
+cursor = conn.cursor()
+conn.select_db("test")  # 选择数据库
+# 使用游标对象，执行sql语句
+cursor.execute("CREATE TABLE test_pymysql(id INT, info VARCHAR(255))")
+# 关闭到数据库的链接
+conn.close()
+```
+
+**执行查询性质的SQL语句**
+
+```python
+# 执行查询性质SQL
+from pymysql import Connection
+# 获取到MySQL数据库的链接对象
+conn = Connection(
+    host='localhost',   # 主机名（或IP地址）
+    port=3306,          # 端口，默认3306
+    user='root',        # 用户名
+    password='123456'   # 密码
+)
+# 获取游标对象
+cursor = conn.cursor()
+conn.select_db("test")  # 选择数据库
+# 使用游标对象，执行sql语句
+cursor.execute("SELECT * FROM team")
+# 获取查询结果
+results: tuple = cursor.fetchall()
+for res in results:
+    print(res)
+# 关闭到数据库的链接
+conn.close()
+```
+
+游标对象使用fetchall()方法，得到的是全部的查询结果，是一个元组
+
+这个元组内部嵌套了元组，嵌套的元组就是一行查询结果
+
+##### 7.2 数据插入
+
+```python
+# commit提交
+from pymysql import Connection
+# 获取到MySQL数据库的链接对象
+conn = Connection(
+    host='localhost',    # 主机名（或IP地址）
+    port=3306,           # 端口，默认3306
+    user='root',         # 用户名
+    password='123456'    # 密码
+    # autocommit=True     # 设置自动提交
+)
+# 获取游标对象
+cursor = conn.cursor()
+# 选择数据库
+conn.select_db("test")
+# 使用游标对象，执行sql语句
+cursor.execute("insert into team values(8, 'AS仙阁')")
+# 通过链接对象的commit()方法进行提交，否则不会插入数据
+conn.commit()
+# 关闭到数据库的链接
+conn.close()
+```
+
+#### 8、综合案例
+
+案例需求：我们使用《面向对象》章节案例中的数据集，完成使用Python语言，读取数据，并将数据写入MySQL的功能。
+
+本次需求开发我们需要新建一个数据库来使用，数据库名称：py_sql
+
+基于数据结构，可以得到建表语句：
+
+```sql
+CREATE TABLE orders(
+	order_date DATE,
+    order_id VARCHAR(255),
+    money INT,
+    province VARCHAR(10)
+);
+```
+
+代码执行完成后，可将所有数据插入到数据库的表中，可通过以下查询语句查询相应数据
+
+```sql
+select count(*) from orders;
+select order_date, sum(money) from orders group by order_date ;
+```
 
 
 
-
-
-
-
-
-
-
-
-
-
-
+## 第三阶段
 
 
 

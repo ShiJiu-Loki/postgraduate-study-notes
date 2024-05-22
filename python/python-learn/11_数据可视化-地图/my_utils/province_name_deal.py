@@ -1,0 +1,77 @@
+def name_deal(name):
+    """
+    将省份名称简写映射为全写
+    :param name: 省份名称简写
+    :return: 省份名称全写，不存在返回空字符串
+    """
+    name = str(name)
+    if name.startswith('台湾'):
+        return '台湾省'
+    elif name.startswith('江苏'):
+        return '江苏省'
+    elif name.startswith('云南'):
+        return '云南省'
+    elif name.startswith('河南'):
+        return '河南省'
+    elif name.startswith('上海'):
+        return '上海市'
+    elif name.startswith('湖南'):
+        return '湖南省'
+    elif name.startswith('湖北'):
+        return '湖北省'
+    elif name.startswith('广东'):
+        return '广东省'
+    elif name.startswith('香港'):
+        return '香港特别行政区'
+    elif name.startswith('福建'):
+        return '福建省'
+    elif name.startswith('浙江'):
+        return '浙江省'
+    elif name.startswith('山东'):
+        return '山东省'
+    elif name.startswith('四川'):
+        return '四川省'
+    elif name.startswith('天津'):
+        return '天津市'
+    elif name.startswith('北京'):
+        return '北京市'
+    elif name.startswith('陕西'):
+        return '陕西省'
+    elif name.startswith('广西'):
+        return '广西壮族自治区'
+    elif name.startswith('辽宁'):
+        return '辽宁省'
+    elif name.startswith('重庆'):
+        return '重庆市'
+    elif name.startswith('澳门'):
+        return '澳门特别行政区'
+    elif name.startswith('甘肃'):
+        return '甘肃省'
+    elif name.startswith('山西'):
+        return '山西省'
+    elif name.startswith('海南'):
+        return '海南省'
+    elif name.startswith('内蒙古'):
+        return '内蒙古自治区'
+    elif name.startswith('吉林'):
+        return '吉林省'
+    elif name.startswith('黑龙江'):
+        return '黑龙江省'
+    elif name.startswith('宁夏'):
+        return '宁夏回族自治区'
+    elif name.startswith('青海'):
+        return '青海省'
+    elif name.startswith('江西'):
+        return '江西省'
+    elif name.startswith('贵州'):
+        return '贵州省'
+    elif name.startswith('西藏'):
+        return '西藏自治区'
+    elif name.startswith('安徽'):
+        return '安徽省'
+    elif name.startswith('河北'):
+        return '河北省'
+    elif name.startswith('新疆'):
+        return '新疆维吾尔自治区'
+    else:
+        return ''
