@@ -3848,17 +3848,649 @@ select order_date, sum(money) from orders group by order_date ;
 
 ## 第三阶段
 
+### 第十五章 PySpark（未完成，暂时跳过）
+
+Q：什么是Spark、什么是PySpark
+
+- Spark是Apache基金会旗下的顶级开源项目，用于对海量数据进行大规模分布式计算。
+
+- PySpark是Spark的Python实现，是Spark为Python开发者提供的编程入口，用于以Python代码完成Spark任务的开发
+
+- PySpark不仅可以作为Python第三方库使用，也可以将程序提交的Spark集群环境中，调度大规模集群进行执行。
+
+Q：为什么要学习PySpark？
+
+A：大数据开发是Python众多就业方向中的明星赛道，薪资高岗位多，Spark（PySpark）又是大数据开发中的核心技术
+
+#### 1、基础准备
+
+PySpark库的安装
+在”CMD”命令提示符程序内，输入：`pip install pyspark`
+或使用国内代理镜像网站（清华大学源）
+
+```cmd
+pip install -i https://pypi.tuna.tsinghua.edu.cn/simple pyspark
+```
+
+PySpark的编程模型是？
+
+- 数据输入：通过SparkContext完成数据读取
+
+- 数据计算：读取到的数据转换为RDD对象，调用RDD的成员方法完成计算
+
+- 数据输出：调用RDD的数据输出相关成员方法，将结果输出到list、元组、字典、文本文件、数据库等
+
+```python
+# 导包
+from pyspark import SparkConf, SparkContext
+
+# 创建SparkConf类对象
+conf = SparkConf().setMaster("local[*]").setAppName("test_spark_app")
+# 基于SparkConf类对象创建SparkContext类对象
+sc = SparkContext(conf=conf)
+
+# 打印PySpark的运行版本
+print(sc.version)
+
+# 停止SparkContext对象的运行（停止PySpark程序）
+sc.stop()
+```
+
+#### 2、数据输入
+
+PySpark支持多种数据的输入，在输入完成后，都会得到一个：RDD类的对象
+RDD全称为：弹性分布式数据集（Resilient Distributed Datasets）
+
+PySpark针对数据的处理，都是以RDD对象作为载体，即：
+
+- 数据存储在RDD内
+
+- 各类数据的计算方法，也都是RDD的成员方法
+
+- RDD的数据计算方法，返回值依旧是RDD对象
+
+**Python数据容器转RDD对象**
+
+PySpark支持通过SparkContext对象的parallelize成员方法，将：list、tuple、set、dict、str 转换为PySpark的RDD对象
+
+注意：
+
+- 字符串会被拆分出1个个的字符，存入RDD对象
+
+- 字典仅有key会被存入RDD对象
+
+PySpark也支持通过SparkContext入口对象，来读取文件，来构建出RDD对象。
+
+```python
+from pyspark import SparkConf, SparkContext
+
+conf = SparkConf().setMaster("local[*]").setAppName("test_spark_app")
+sc = SparkContext(conf=conf)
+
+list = [1, 2, 3, 4, 5]
+tuple = (5, 4, 3, 2, 1)
+set = {'s', 'e', 't', 's'}
+dict = {"name": 'lawliet', "gender": "male"}
+str = "lawliet"
+# parallelize(数据容器对象)
+rdd = sc.parallelize(dict)
+# PySpark也支持通过SparkContext入口对象，来读取文件，来构建出RDD对象。
+# textFile(文件路径)
+# sc.textFile()
+# 输出RDD的内容
+print(rdd.collect())
+```
+
+总结：
+
+1.RDD对象是什么？为什么要使用它？
+
+RDD对象称之为分布式弹性数据集，是PySpark中数据计算的载体，它可以：
+
+•提供数据存储
+
+•提供数据计算的各类方法
+
+•数据计算的方法，返回值依旧是RDD（RDD迭代计算）
+
+后续对数据进行各类计算，都是基于RDD对象进行
+
+2.如何输入数据到Spark（即得到RDD对象）
+
+•通过SparkContext的parallelize成员方法，将Python数据容器转换为RDD对象
+
+•通过SparkContext的textFile成员方法，读取文本文件得到RDD对象
+
+#### 3、数据计算
+
+PySpark的数据计算，都是基于RDD对象来进行的，那么如何进行呢？
+
+自然是依赖，RDD对象内置丰富的：成员方法（算子）
+
+##### 3.1 map方法
+
+map算子
+
+功能：map算子，是将RDD的数据一条条处理（处理的逻辑基于map算子中接收的处理函数），返回新的RDD
+
+总结：
+
+1.map算子（成员方法）
+
+•接受一个处理函数，可用lambda表达式快速编写
+
+•对RDD内的元素逐个处理，并返回一个新的RDD
+
+2.链式调用
+
+•对于返回值是新RDD的算子，可以通过链式调用的方式多次调用算子。
+
+注意：python解释器版本3.12似乎比较高，不能够兼容pyspark，降低版本至3.10
+
+##### 3.2 flatMap方法
+
+flatMap算子
+
+•计算逻辑和map一样
+
+•可以比map多出，解除一层嵌套的功能
+
+##### 3.3 reduceByKey方法
+
+功能：针对KV型RDD，自动按照key分组，然后根据提供的聚合逻辑，完成组内数据(value)的聚合操作
+
+##### 3.4 练习案例1
 
 
 
+##### 3.5 filter方法
 
 
 
+##### 3.6 distinct方法
 
 
 
+##### 3.7 sortBy方法
 
 
 
+##### 3.8 练习案例2
 
+
+
+#### 4、数据输出
+
+
+
+#### 5、综合案例
+
+
+
+#### 6、分布式集群运行
+
+---
+
+### 第十六章 Python高阶技巧（拓展）
+
+#### 1、闭包
+
+在函数嵌套的前提下，内部函数使用了外部函数的变量，并且外部函数返回了内部函数，我们把这个使用外部函数变量的内部函数称为闭包。
+
+```python
+# 通过全局变量account_amount来记录余额
+account_amount = 0      # 账户余额
+def atm(num, deposit=True):
+    global account_amount
+    if deposit:
+        account_amount += num
+        print(f"存款：+{num}，账户余额：{account_amount}")
+    else:
+        account_amount -= num
+        print(f"取款：-{num}，账户余额：{account_amount}")
+
+atm(300)
+atm(300)
+atm(100, False)
+print("===========================================================")
+
+
+# 闭包
+def account_create(initial_amount=0):
+    def atm(num, deposit=True):
+        nonlocal initial_amount		#需要使用nonlocal关键字修饰外部函数的变量才可在内部函数中修改它
+        if deposit:
+            initial_amount += num
+            print(f"存款：+{num}，账户余额：{initial_amount}")
+        else:
+            initial_amount -= num
+            print(f"取款：-{num}，账户余额：{initial_amount}")
+    return atm
+
+ac = account_create()
+ac(300)
+ac(300)
+ac(100, False)
+```
+
+总结
+
+1.什么是闭包
+
+定义双层嵌套函数， 内层函数可以访问外层函数的变量
+
+将内存函数作为外层函数的返回，此内层函数就是闭包函数
+
+2.闭包的好处和缺点
+
+•优点：不定义全局变量，也可以让函数持续访问和修改一个外部变量
+
+•优点：闭包函数引用的外部变量，是外层函数的内部变量。作用域封闭难以被误操作修改
+
+•缺点：额外的内存占用
+
+3.nonlocal关键字的作用
+
+在闭包函数（内部函数中）想要修改外部函数的变量值
+
+需要用nonlocal声明这个外部变量
+
+#### 2、装饰器
+
+装饰器其实也是一种闭包， 其功能就是在不破坏目标函数原有的代码和功能的前提下，为目标函数增加新功能。
+装饰器就是使用创建一个闭包函数，在闭包函数内调用目标函数。
+可以达到不改动目标函数的同时，增加额外的功能。
+
+希望给sleep函数，增加一个功能：
+
+•在调用sleep前输出：我要睡觉了
+
+•在调用sleep后输出：我起床了
+
+可以使用装饰器来实现
+
+```python
+# 装饰器的一般写法（闭包写法）
+# 定义一个闭包函数，在闭包函数内部：执行目标函数;并完成功能的添加
+def outer(func):
+    def inner():
+        print("我要睡觉了")
+        func()
+        print("我起床了")
+    return inner
+
+def sleep():
+    import random
+    import time
+    print("睡眠中......")
+    time.sleep(random.randint(1, 5))
+
+fn = outer(sleep)
+fn()
+print("==================================================")
+
+
+# 装饰器的语法糖写法
+# 使用@outer定义在目标函数sleep之上
+def outer(func):
+    def inner():
+        print("我要睡觉了")
+        func()
+        print("我起床了")
+    return inner
+
+@outer
+def sleep():
+    import random
+    import time
+    print("睡眠中......")
+    time.sleep(random.randint(1, 5))
+
+sleep()
+```
+
+注意：@outer不是固定的，是根据外部函数名称来改变的，格式：@外部函数名
+
+#### 3、设计模式
+
+设计模式是一种编程套路，可以极大的方便程序的开发。
+最常见、最经典的设计模式，就是我们所学习的面向对象了。
+
+除了面向对象外，在编程中也有很多既定的套路可以方便开发，我们称之为设计模式：
+
+- 单例、工厂模式
+
+- 建造者、责任链、状态、备忘录、解释器、访问者、观察者、中介、模板、代理模式
+
+- 等等模式
+
+##### 3.1 单例模式
+
+某些场景下， 我们需要一个类无论获取多少次类对象，都仅仅提供一个具体的实例，用以节省创建类对象的开销和内存开销；比如某些工具类，仅需要1个实例，即可在各处使用；这就是单例模式所要实现的效果。
+
+单例模式（Singleton Pattern）是一种常用的软件设计模式，该模式的主要目的是确保某一个类只有一个实例存在。在整个系统中，某个类只能出现一个实例时，单例对象就能派上用场。
+
+•定义: 保证一个类只有一个实例,并提供一个访问它的全局访问点
+
+•适用场景:当一个类只能有一个实例，而客户可以从一个众所周知的访问点访问它时。
+
+在一个文件中定义如下代码
+
+```python
+class StrTools:
+    pass
+
+str_tool = StrTools()
+```
+
+在另一个文件中导入对象
+
+```python
+from test import str_tool
+
+s1 = str_tool
+s2 = str_tool
+print(s1)       # s1和s2是同一个对象
+print(s2)       # s1和s2是同一个对象
+
+
+class Tool:
+    pass
+
+t1 = Tool()
+t2 = Tool()
+print(t1)       # t1和t2不是同一个对象
+print(t2)       # t1和t2不是同一个对象
+```
+
+**总结**
+
+单例模式就是对一个类，只获取其唯一的类实例对象，持续复用它。
+
+•节省内存
+
+节省创建对象的开销
+
+##### 3.2 工厂模式
+
+当需要大量创建一个类的实例的时候， 可以使用工厂模式。即，从原生的使用类的构造去创建对象的形式 迁移到，基于工厂提供的方法去创建对象的形式。
+
+```python
+# 原生使用类创建对象方式
+class Person:
+    pass
+class Worker(Person):
+    pass
+class Student(Person):
+    pass
+class Teacher(Person):
+    pass
+
+worker = Worker()
+stu = Student()
+teacher = Teacher()
+
+
+# 工厂模式
+class Person:
+    pass
+class Worker(Person):
+    pass
+class Student(Person):
+    pass
+class Teacher(Person):
+    pass
+
+class Factory:
+    def get_person(self, p_type):
+        if p_type == 'w':
+            return Worker()
+        elif p_type == 's':
+            return Student()
+        else:
+            return Teacher()
+
+factory = Factory()
+worker = factory.get_person('w')
+stu = factory.get_person('s')
+teacher = factory.get_person('t')
+```
+
+使用工厂类的get_person()方法去创建具体的类对象
+
+优点：
+
+- 大批量创建对象的时候有统一的入口，易于代码维护
+
+- 当发生修改，仅修改工厂类的创建方法即可
+
+- 符合现实世界的模式，即由工厂来制作产品（对象）
+
+#### 4、多线程
+
+**进程、线程和并行执行**
+
+进程： 就是一个程序，运行在系统之上，那么便称之这个程序为一个运行进程，并分配进程ID方便系统管理。
+线程：线程是归属于进程的，一个进程可以开启多个线程，执行不同的工作，是进程的实际工作最小单位。
+
+操作系统中可以运行多个进程，即多任务运行
+一个进程内可以运行多个线程，即多线程运行
+
+注意点：
+进程之间是内存隔离的， 即不同的进程拥有各自的内存空间。 这就类似于不同的公司拥有不同的办公场所。
+线程之间是内存共享的，线程是属于进程的，一个进程内的多个线程之间是共享这个进程所拥有的内存空间的。这就好比，公司员工之间是共享公司的办公场所。
+
+并行执行的意思指的是同一时间做不同的工作。进程之间就是并行执行的，操作系统可以同时运行好多程序，这些程序都是在并行执行。
+
+Python的多线程可以通过threading模块来实现。
+
+```python
+import threading
+
+thread_obj = threading.Thread([group [, target [, name [, args [, kwargs]]]]])
+- group：暂时无用，未来功能的预留参数
+- target：执行的目标任务名
+- args：以元组的方式给执行任务传参
+- kwargs：以字典方式给执行任务传参
+- name：线程名，一般不用设置
+    
+# 启动线程，让线程开始工作
+thread_obj.start()
+```
+
+**总结**
+
+threading模块的使用
+
+thread_obj = threading.Thread(target=func) 创建线程对象
+
+thread_obj.start() 启动线程执行
+
+#### 5、网络编程
+
+socket (简称 套接字) 是进程之间通信一个工具，好比现实生活中的插座，所有的家用电器要想工作都是基于插座进行，<font color='red'>进程之间想要进行网络通信需要socket。</font>
+Socket负责进程之间的网络数据传输，好比数据的搬运工。
+
+2个进程之间通过Socket进行相互通讯，就必须有服务端和客户端
+Socket服务端：等待其它进程的连接、可接受发来的消息、可以回复消息
+Socket客户端：主动连接服务端、可以发送消息、可以接收回复
+
+#### 6、正则表达式
+
+正则表达式，又称规则表达式（Regular Expression），是使用单个字符串来描述、匹配某个句法规则的字符串，常被用来检索、替换那些符合某个模式（规则）的文本。
+
+简单来说，正则表达式就是使用：字符串定义规则，并通过规则去验证字符串是否匹配。
+比如，验证一个字符串是否是符合条件的电子邮箱地址，只需要配置好正则规则，即可匹配任意邮箱。
+比如通过正则规则： (^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$) 即可匹配一个字符串是否是标准邮箱格式
+
+但如果不使用正则，使用if else来对字符串做判断就非常困难了。
+
+##### 6.1 基础匹配
+
+Python正则表达式，使用re模块，并基于re模块中三个基础方法来做正则匹配。
+
+分别是：match、search、findall 三个基础方法
+
+- re.match(匹配规则， 被匹配字符串)
+  - 从被匹配字符串开头进行匹配， 匹配成功返回匹配对象（包含匹配的信息）
+  - 匹配不成功返回空。
+
+- search(匹配规则， 被匹配字符串)
+  - 搜索整个字符串，找出匹配的。从前向后，找到第一个后，就停止，不会继续向后
+  - 整个字符串都找不到，返回None
+
+- findall(匹配规则， 被匹配字符串)
+  - 匹配整个字符串，找出全部匹配项
+  - 找不到返回空list: []
+
+```python
+import re
+
+# match匹配
+s = "python itheima python itheima python itheima"
+result = re.match('python', s)
+print(result)               # <re.Match object; span=(0, 6), match='python'>
+print(result.span())        # (0, 6)
+print(result.group())       # python
+s = "1python itheima python itheima python itheima"
+result = re.match('python', s)
+print(result)               # None
+print("===================================================")
+
+# search
+s = "1python666itheima666python666"
+result = re.search('python', s)
+print(result)               # <re.Match object; span=(1, 7), match='python'>
+print(result.span())        # (1, 7)
+print(result.group())       # python
+s = "itheima666"
+result = re.search('python', s)
+print(result)               # None
+print("===================================================")
+
+# findall
+s = "1python666itheima666python666"
+result = re.findall('python', s)
+print(result)               # ['python', 'python']
+result = re.findall('itcast', s)
+print(result)               # []
+```
+
+注意：match只匹配开头
+
+##### 6.2 元字符匹配
+
+正则最强大的功能在于元字符匹配规则
+
+单字符匹配：
+
+| 字符 | 功能                                      |
+| ---- | ----------------------------------------- |
+| .    | 匹配任意1个字符（除了\n），\\. 匹配点本身 |
+| [ ]  | 匹配[ ]中列举的字符                       |
+| \d   | 匹配数字，即0-9                           |
+| \D   | 匹配非数字                                |
+| \s   | 匹配空白，即空格、tab键                   |
+| \S   | 匹配非空白                                |
+| \w   | 匹配单词字符，即a-z、A-Z、0-9、_          |
+| \W   | 匹配非单词字符                            |
+
+数量匹配：
+
+| 字符   | 功能                              |
+| ------ | --------------------------------- |
+| *      | 匹配前一个规则的字符出现0至无数次 |
+| +      | 匹配前一个规则的字符出现1至无数次 |
+| ?      | 匹配前一个规则的字符出现0次或1次  |
+| {m}    | 匹配前一个规则的字符出现m次       |
+| {m, }  | 匹配前一个规则的字符出现最少m次   |
+| {m, n} | 匹配前一个规则的字符出现m到n次    |
+
+边界匹配：
+
+| 字符 | 功能               |
+| ---- | ------------------ |
+| ^    | 匹配字符串开头     |
+| $    | 匹配字符串结尾     |
+| \b   | 匹配一个单词的边界 |
+| \B   | 匹配非单词边界     |
+
+分组匹配：
+
+| 字符 | 功能                     |
+| ---- | ------------------------ |
+| \|   | 匹配左右任意一个表达式   |
+| ( )  | 将括号中字符作为一个分组 |
+
+•找出全部数字：re.findall(r‘\d’, s)
+
+•找出特殊字符：re.findall(r‘\W’, s)
+
+•找出全部英文字母：re.findall(r’[a-zA-Z]’, s)
+
+<font color='red'>字符串的r标记，表示当前字符串是原始字符串，即内部的转义字符无效而是普通字符</font>
+
+字符串的r标记表示，字符串内转移字符无效，作为普通字符使用
+
+```python
+"""
+演示Python正则表达式使用元字符进行匹配
+"""
+import re
+
+# 匹配账号，只能由字母和数字组成，长度限制6到10位
+r = '^[0-9a-zA-Z]{6,10}$'
+s = '123456_'
+print(re.findall(r, s))
+
+# 匹配QQ号，要求纯数字，长度5-11，第一位不为0
+r = '^[1-9][0-9]{4,10}$'
+s = '123453678'
+print(re.findall(r, s))
+
+# 匹配邮箱地址，只允许qq、163、gmail这三种邮箱地址
+# abc.efg.daw@qq.com.cn.eu.qq.aa.cc
+# abc@qq.com
+# {内容}.{内容}.{内容}.{内容}.{内容}.{内容}.{内容}.{内容}@{内容}.{内容}.{内容}
+r = r'(^[\w-]+(\.[\w-]+)*@(qq|163|gmail)(\.[\w-]+)+$)'
+s1 = 'a.b.c.d.e.f.g@qq.com.a.z.c.d.e'
+s2 = 'a.b.c.d.e.f.g@126.com.a.z.c.d.e'
+print(re.match(r, s1))
+print(re.match(r, s2))
+```
+
+#### 7、递归
+
+递归： 即方法（函数）自己调用自己的一种特殊编程写法
+
+如：
+
+```python
+def func():
+    if ...:
+        func()
+    return ...
+```
+
+函数调用自己，即称之为递归调用。
+
+**总结**
+
+1.什么是递归
+
+在满足条件的情况下，函数自己调用自己的一种特殊编程技巧
+
+2.递归需要注意什么？
+
+•注意退出的条件，否则容易变成无限递归
+
+•注意返回值的传递，确保从最内层，层层传递到最外层
+
+3.os模块的3个方法
+
+•os.listdir，列出指定目录下的内容
+
+•os.path.isdir，判断给定路径是否是文件夹，是返回True，否返回False
+
+•os.path.exists，判断给定路径是否存在，存在返回True，否则返回False
 
