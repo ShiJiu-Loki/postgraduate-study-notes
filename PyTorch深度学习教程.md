@@ -499,7 +499,316 @@ writer.close()
 
 ## 14、DataLoader的使用
 
+参考代码
 
+```python
+import torchvision
+
+# 准备的测试数据集
+from torch.utils.data import DataLoader
+from torch.utils.tensorboard import SummaryWriter
+
+test_data = torchvision.datasets.CIFAR10("./dataset_torchvision", train=False, transform=torchvision.transforms.ToTensor())
+
+test_loader = DataLoader(dataset=test_data, batch_size=64, shuffle=False, num_workers=0, drop_last=True)
+
+# 测试数据集中第一张图片及target
+img, target = test_data[0]
+print(img.shape)
+print(target)
+
+writer = SummaryWriter("dataloader")
+for epoch in range(2):
+    step = 0
+    for data in test_loader:
+        imgs, targets = data
+        # print(imgs.shape)
+        # print(targets)
+        writer.add_images("Epoch: {}".format(epoch), imgs, step)
+        step += 1
+
+writer.close()
+```
+
+Terminal终端
+
+```shell
+tensorboard --logdir=dataloader
+```
+
+target不是标签，是标签存放的位置，标签列表是classes，真正的标签是classes[target]
+
+运行for循环就会重新调用test_loader,如果shuffle是True的话，那么bactch_size中的图片都不一样
+
+其实很形象,suffle就是洗牌
+
+## 15、神经网络的基本骨架——nn.Module的使用
+
+torch.nn是Python API的神经网络工具包，nn是神经网络neural network的缩写
+
+nn.Module的基本使用
+
+```python
+import torch
+from torch import nn
+
+
+class Tudui(nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def forward(self, input):
+        output = input + 1
+        return output
+
+
+tudui = Tudui()
+x = torch.tensor(1.0)
+output = tudui(x)
+print(output)
+```
+
+输入内容在神经网络中需要经过forward函数的处理，然后生成一个输出
+
+## 16、卷积操作
+
+在Pytorch官网上有对神经网络相关内容的封装：https://pytorch.org/docs/stable/nn.html#convolution-layers
+
+torch.nn是对torch.nn.functional的封装，更加易于使用
+
+conv是convolution（卷积）的简写
+
+卷积的计算是卷积核（3×3）在输入图像（5×5）中从左上角依次向右向下移动，将每个位置的两个数值做乘法运算再累加，得到该位置的结果，结果也是一个图像
+
+```python
+import torch
+import torch.nn.functional as F
+input = torch.tensor([[1, 2, 0, 3, 1],
+                      [0, 1, 2, 3, 1],
+                      [1, 2, 1, 0, 0],
+                      [5, 2, 3, 1, 1],
+                      [2, 1, 0, 1, 1]])
+kernel = torch.tensor([[1, 2, 1],
+                       [0, 1, 0],
+                       [2, 1, 0]])
+
+input = torch.reshape(input, (1, 1, 5, 5))
+kernel = torch.reshape(kernel, (1, 1, 3, 3))
+
+print(input.shape)
+print(kernel.shape)
+
+output = F.conv2d(input, kernel, stride=1)
+print(output)
+
+output2 = F.conv2d(input, kernel, stride=2)
+print(output2)
+
+output3 = F.conv2d(input, kernel, stride=1, padding=1)
+print(output3)
+```
+
+stride=1（步径、步长），进行计算时向右移动1格，到最右侧时，需要回到最左侧向下移动1格
+
+padding=1，在输入图像左右各插入一列，上下各插入一行，插入的数值为0，然后进行卷积运算
+
+## 17、神经网络-卷积层
+
+参考代码
+
+```python
+import torch
+import torchvision
+from torch import nn
+from torch.nn import Conv2d
+from torch.utils.data import DataLoader
+from torch.utils.tensorboard import SummaryWriter
+
+dataset = torchvision.datasets.CIFAR10("../dataset_torchvision", train=False, transform=torchvision.transforms.ToTensor(),
+                                       download=True)
+dataloader = DataLoader(dataset, batch_size=64)
+
+class Tudui(nn.Module):
+    def __init__(self):
+        super(Tudui, self).__init__()
+        self.conv1 = Conv2d(in_channels=3, out_channels=6, kernel_size=3, stride=1, padding=0)
+
+    def forward(self, x):
+        x = self.conv1(x)
+        return x
+
+tudui = Tudui()
+
+writer = SummaryWriter("../logs")
+
+step = 0
+for data in dataloader:
+    imgs, targets = data
+    output = tudui(imgs)
+    print(imgs.shape)
+    print(output.shape)
+    # torch.Size([64, 3, 32, 32])
+    writer.add_images("input", imgs, step)
+    # torch.Size([64, 6, 30, 30]) -> [xxx, 3, 30, 30]
+
+    output = torch.reshape(output, (-1, 3, 30, 30))
+    writer.add_images("output", output, step)
+    step += 1
+```
+
+目录中./、../、/的区别
+
+> ./是当前目录（其中./等价于不写，即href=“./layui/css/layui.css”和href=“layui/css/layui.css”是一样的效果）
+> ../是父级目录（表示当前文件夹下的，上一个文件夹）
+> /是根目录（表示一下子回到最顶端的那个文件夹下）
+
+## 18、神经网络-最大池化的使用
+
+Floor向下取整，Ceiling向上取整
+
+池化核大小Kernel_Size=3（3×3），那么移动步长则为池化核大小，即3
+
+池化核在输入图像上覆盖数量不足时，是否计算要看Ceil_model值，Ceil_model=True则计算，=False则不计算
+
+最大池化作用：保留输入数据的特征，并且想让数据量减少
+
+```python
+import torch
+from torch import nn
+from torch.nn import MaxPool2d
+
+input = torch.tensor([[1, 2, 0, 3, 1],
+                      [0, 1, 2, 3, 1],
+                      [1, 2, 1, 0, 0],
+                      [5, 2, 3, 1, 1],
+                      [2, 1, 0, 1, 1]], dtype=torch.float32)
+
+input = torch.reshape(input, (-1, 1, 5, 5))
+print(input.shape)
+
+class Tudui(nn.Module):
+    def __init__(self):
+        super(Tudui, self).__init__()
+        self.maxpool1 = MaxPool2d(kernel_size=3, ceil_mode=False)
+
+    def forward(self, input):
+        output = self.maxpool1(input)
+        return output
+
+tudui = Tudui()
+output = tudui(input)
+print(output)
+```
+
+## 19、神经网络-非线性激活
+
+非线性变换：给神经网络引入非线性特征，非线性特征够多，才能训练出符合各种曲线、符合各种特征的一个模型
+
+```python
+import torch
+from torch import nn
+from torch.nn import ReLU
+
+input = torch.tensor([[1, -0.5],
+                      [-1, 3]])
+
+output = torch.reshape(input, (-1, 1, 2, 2))
+print(output.shape)
+
+class Tudui(nn.Module):
+    def __init__(self):
+        super(Tudui, self).__init__()
+        self.relu1 = ReLU()
+
+    def forward(self, input):
+        output = self.relu1(input)
+        return output
+
+tudui = Tudui()
+output = tudui(input)
+print(output)
+```
+
+## 20、神经网络-线性层及其他层介绍
+
+torch.nn中：
+
+- Convolution Layers 卷积层
+- Pooling Layers 池化层
+- Non-linear Activations 非线性激活
+- Normalization Layers 正则层
+- Linear Layers 线性层
+
+正则层能加快神经网络的训练速度
+
+```python
+import torch
+import torchvision
+from torch import nn
+from torch.nn import Linear
+from torch.utils.data import DataLoader
+
+dataset = torchvision.datasets.CIFAR10("./dataset_torchvision", train=False,
+                                       transform=torchvision.transforms.ToTensor(),
+                                       download=True)
+
+dataloader = DataLoader(dataset, batch_size=64)
+
+class Tudui(nn.Module):
+    def __init__(self):
+        super(Tudui, self).__init__()
+        self.linear1 = Linear(196608, 10)
+
+    def forward(self, input):
+        output = self.linear1(input)
+        return output
+
+tudui = Tudui()
+
+for data in dataloader:
+    imgs, targets = data
+    print(imgs.shape)
+    # output = torch.reshape(imgs, (1, 1, 1, -1))
+    output = torch.flatten(imgs)
+    print(output.shape)
+    output = tudui(output)
+    print(output.shape)
+```
+
+## 21、神经网络-搭建小实战和Sequential的使用
+
+```python
+from torch import nn
+from torch.nn import Conv2d, MaxPool2d, Flatten, Linear
+
+class Tudui(nn.Module):
+    def __init__(self):
+        super(Tudui, self).__init__()
+        self.conv1 = Conv2d(3, 32, 5, padding=2)
+        self.maxpool1 = MaxPool2d(2)
+        self.conv2 = Conv2d(32, 32, 5, padding=2)
+        self.maxpool2 = MaxPool2d(2)
+        self.conv3 = Conv2d(32, 64, 5, padding=2)
+        self.maxpool3 = MaxPool2d(2)
+        self.flatten = Flatten()
+        self.linear1 = Linear(1024, 64)
+        self.linear2 = Linear(64, 10)
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.maxpool1(x)
+        x = self.conv2(x)
+        x = self.maxpool2(x)
+        x = self.conv3(x)
+        x = self.maxpool3(x)
+        x = self.flatten(x)
+        x = self.linear1(x)
+        x = self.linear2(x)
+        return x
+
+tudui = Tudui()
+print(tudui)
+```
 
 
 

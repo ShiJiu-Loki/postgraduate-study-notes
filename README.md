@@ -1,2 +1,2 @@
 # postgraduate-study-notes
-研0学习笔记
+研究生学习笔记
